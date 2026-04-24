@@ -28,6 +28,6 @@ jobs:
           git add .
           git commit -m "Auto-fix: Remove invalid metadata.widgets from Colab" || echo "No changes to commit"
           
-          git pull --rebase origin HEAD
+          git pull --rebase origin main
           
-          git push
+          git push origin HEAD:main
