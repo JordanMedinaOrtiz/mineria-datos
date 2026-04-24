@@ -1,0 +1,27 @@
+name: Fix Colab Notebook Metadata
+
+on:
+  push:
+    paths:
+      - '**.ipynb'
+
+jobs:
+  clean-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Remove invalid metadata.widgets
+        run: |
+          # Busca todos los archivos .ipynb y usa jq para eliminar el nodo problemático
+          find . -name "*.ipynb" -exec sh -c 'jq "del(.metadata.widgets)" "{}" > tmp.ipynb && mv tmp.ipynb "{}"' \;
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          # Si hubo cambios, hace el commit. Si jq no encontró nada que borrar, no falla.
+          git commit -m "Auto-fix: Remove invalid metadata.widgets from Colab" || echo "No changes to commit"
+          git push
